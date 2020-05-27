@@ -28,8 +28,14 @@ class MainActivity : AppCompatActivity() {
 
     private  fun  setOneTimeWorkRequest(){
         val  workManager : WorkManager  =  WorkManager.getInstance(applicationContext)
+
+
+
+        //  set input data  from main class
         val   data : Data =  Data.Builder().putInt(KEY_COUNT_VALUES,240).build()
 
+
+        // add  constrants
         val   constraints : Constraints =  Constraints.Builder()
             .setRequiresCharging(false)
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -48,10 +54,14 @@ class MainActivity : AppCompatActivity() {
 
         val  downloadWorker  =  OneTimeWorkRequest.Builder(DownloadingWorker::class.java).build()
 
+
+        // define  for paraller task runing same time
         val   parallerWorkar =  mutableListOf<OneTimeWorkRequest>()
         parallerWorkar.add(downloadWorker)
         parallerWorkar.add(filteringWorker)
 
+
+        // define  chaning with paraller work
 
         WorkManager.getInstance(applicationContext)
             .beginWith(parallerWorkar)
@@ -63,6 +73,8 @@ class MainActivity : AppCompatActivity() {
             textView.text = it.state.name
 
             if(it.state.isFinished){
+
+                //  get  output data from background service
                 val   data =  it.outputData
                 val  message  =  data.getString(UploadWorker.WORKER_KEY)
 
@@ -74,9 +86,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private  fun setPeriodicWorkRequest(){
+
+        // define here  periodic request
         val  periodicWorkRequest  =
             PeriodicWorkRequest.Builder(DownloadingWorker::class.java,16,TimeUnit.MINUTES).build()
-
            WorkManager.getInstance(applicationContext).enqueue(periodicWorkRequest)
 
 
